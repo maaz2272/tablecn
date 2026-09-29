@@ -36,8 +36,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "code",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Task" table={table} />
     ),
     cell: ({ row }) => (
       <span className="font-mono text-xs text-muted-foreground">
@@ -48,8 +48,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "title",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Title" table={table} />
     ),
     cell: ({ row }) => (
       <span className="max-w-[31.25rem] truncate font-medium">
@@ -62,8 +62,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Status" table={table} />
     ),
     cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
     filterFn: (row, id, value: string[]) =>
@@ -72,8 +72,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "label",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Label" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Label" table={table} />
     ),
     cell: ({ row }) => <LabelBadge label={row.getValue("label")} />,
     filterFn: (row, id, value: string[]) =>
@@ -82,8 +82,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "priority",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Priority" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Priority" table={table} />
     ),
     cell: ({ row }) => <PriorityBadge priority={row.getValue("priority")} />,
     filterFn: (row, id, value: string[]) =>
@@ -92,8 +92,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "estimatedHours",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Est. Hours" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Est. Hours" table={table} />
     ),
     cell: ({ row }) => (
       <span className="tabular-nums">{row.getValue("estimatedHours")}h</span>
@@ -102,8 +102,8 @@ export const taskColumns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created" />
+    header: ({ column, table }) => (
+      <DataTableColumnHeader column={column} title="Created" table={table} />
     ),
     cell: ({ row }) => formatDate(row.getValue("createdAt")),
     size: 120,

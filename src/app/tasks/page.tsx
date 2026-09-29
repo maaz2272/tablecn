@@ -7,6 +7,7 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { NewTaskButton } from "@/components/tasks/new-task-button";
 import { TaskStatsCards } from "@/components/tasks/task-stats-cards";
 import { TasksPresetTabs } from "@/components/tasks/tasks-preset-tabs";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,7 @@ export default async function TasksPage(props: TasksPageProps) {
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
+          <ThemeToggle />
           <NewTaskButton />
         </div>
       </div>
