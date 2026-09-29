@@ -1,7 +1,8 @@
 # tablecn-clone
 # TableCN Clone
 
-🚀 **Live Demo:** [View Live Project](https://tablecn-nu.vercel.app/)
+# TableCN Clone
+Live Demo:https://tablecn-m33wi05zt-maaz-7f9f.vercel.app/tasks
 A from-scratch clone of [tablecn.com](https://tablecn.com) — the shadcn/ui +
 TanStack Table advanced data-table showcase — built as a full-stack app per
 your spec:
