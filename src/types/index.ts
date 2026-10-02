@@ -11,8 +11,8 @@ export interface Task {
   priority: TaskPriority;
   estimatedHours: number;
   archived: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface SortItem {

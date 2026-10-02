@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
   type ColumnFiltersState,
   type SortingState,
@@ -38,6 +37,19 @@ export function TasksTable({ data, pageCount, facets }: TasksTableProps) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
+  // Reset row selection state when filters/pagination change to avoid stale selections
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [
+    params.page,
+    params.perPage,
+    params.title,
+    params.status,
+    params.label,
+    params.priority,
+    params.filters,
+  ]);
 
   const sorting: SortingState = params.sort;
   const columnFilters: ColumnFiltersState = React.useMemo(() => {
@@ -104,7 +116,6 @@ export function TasksTable({ data, pageCount, facets }: TasksTableProps) {
       void setParams({ page: next.pageIndex + 1, perPage: next.pageSize });
     },
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   function handleBulkDelete(ids: string[]) {
@@ -113,7 +124,7 @@ export function TasksTable({ data, pageCount, facets }: TasksTableProps) {
       if (res.error) toast.error(res.error);
       else {
         toast.success(`Deleted ${res.count} task(s)`);
-        table.toggleAllRowsSelected(false);
+        setRowSelection({});
         router.refresh();
       }
     });
@@ -125,7 +136,7 @@ export function TasksTable({ data, pageCount, facets }: TasksTableProps) {
       if (res.error) toast.error(res.error);
       else {
         toast.success(`Updated ${res.count} task(s)`);
-        table.toggleAllRowsSelected(false);
+        setRowSelection({});
         router.refresh();
       }
     });

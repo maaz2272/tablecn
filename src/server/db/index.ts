@@ -1,28 +1,51 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __dbClient: ReturnType<typeof postgres> | undefined;
-}
+export type DatabaseInstance = PostgresJsDatabase<typeof schema>;
 
 const connectionString = process.env.DATABASE_URL;
 
-export const hasDb = Boolean(connectionString);
+class DatabaseClientManager {
+  private static instance: DatabaseClientManager;
+  private dbClient: ReturnType<typeof postgres> | null = null;
+  private dbInstance: DatabaseInstance | null = null;
 
-// Reuse connection if Postgres is available
-const client = connectionString
-  ? global.__dbClient ??
-    postgres(connectionString, {
-      max: process.env.NODE_ENV === "production" ? 5 : 1,
-      ssl: "require",
-    })
-  : null;
+  private constructor() {
+    if (connectionString) {
+      // Reuse connection client during Next.js development hot reload
+      const globalClient = (globalThis as unknown as { __pgClient?: ReturnType<typeof postgres> }).__pgClient;
 
-if (process.env.NODE_ENV !== "production" && client) {
-  global.__dbClient = client;
+      this.dbClient = globalClient ?? postgres(connectionString, {
+        max: process.env.NODE_ENV === "production" ? 5 : 1,
+        ssl: "require",
+      });
+
+      if (process.env.NODE_ENV !== "production") {
+        (globalThis as unknown as { __pgClient?: ReturnType<typeof postgres> }).__pgClient = this.dbClient;
+      }
+
+      this.dbInstance = drizzle(this.dbClient, { schema });
+    }
+  }
+
+  public static getInstance(): DatabaseClientManager {
+    if (!DatabaseClientManager.instance) {
+      DatabaseClientManager.instance = new DatabaseClientManager();
+    }
+    return DatabaseClientManager.instance;
+  }
+
+  public getDatabase(): DatabaseInstance | null {
+    return this.dbInstance;
+  }
+
+  public hasConnection(): boolean {
+    return this.dbInstance !== null;
+  }
 }
 
-export const db = client ? drizzle(client, { schema }) : (null as any);
+const dbManager = DatabaseClientManager.getInstance();
 
+export const hasDb = dbManager.hasConnection();
+export const db: DatabaseInstance | null = dbManager.getDatabase();

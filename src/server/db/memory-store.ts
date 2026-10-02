@@ -82,7 +82,6 @@ export function createInitialSeedTasks(count = 120): Task[] {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __memoryTasks: Task[] | undefined;
 }
 

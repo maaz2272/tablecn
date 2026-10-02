@@ -26,7 +26,6 @@ function buildSearchParams(query: Partial<TasksQuery>) {
   return params;
 }
 
-/** Direct in-memory dispatch to Hono routes (avoids network loopback issues on Vercel) */
 async function callHono<T>(
   path: string,
   options: RequestInit = {}
@@ -53,29 +52,28 @@ async function callHono<T>(
 
 export async function getTasks(
   query: Partial<TasksQuery>
-): Promise<TasksResponse> {
+): Promise<TasksResponse & { error?: string }> {
   const params = buildSearchParams(query);
   const { data, error } = await callHono<TasksResponse>(
     `/api/tasks?${params.toString()}`
   );
 
   if (error || !data) {
-    console.error("getTasks failed:", error);
-    return { data: [], pageCount: 0, total: 0 };
+    return { data: [], pageCount: 0, total: 0, error: error ?? "Failed to load tasks" };
   }
   return data;
 }
 
 export async function getTaskFacets(
   query: Partial<TasksQuery>
-): Promise<FacetsResponse> {
+): Promise<FacetsResponse & { error?: string }> {
   const params = buildSearchParams(query);
   const { data, error } = await callHono<FacetsResponse>(
     `/api/tasks/facets?${params.toString()}`
   );
 
   if (error || !data) {
-    return { status: [], label: [], priority: [] };
+    return { status: [], label: [], priority: [], error };
   }
   return data;
 }
@@ -149,8 +147,11 @@ export async function bulkUpdateTasks(
 }
 
 export async function seedTasksAction() {
-  const { error } = await callHono("/api/tasks/seed", { method: "POST" });
+  const { data, error } = await callHono<{ message?: string }>("/api/tasks/seed", {
+    method: "POST",
+  });
+
   if (error) return { error };
   revalidatePath("/tasks");
-  return { success: true };
+  return { success: true, message: data?.message };
 }

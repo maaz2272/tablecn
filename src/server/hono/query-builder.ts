@@ -21,21 +21,13 @@ import {
 import { tasks } from "../db/schema";
 import type { z } from "zod";
 import type { filterItemSchema, getTasksQuerySchema } from "./validators";
+import { getWhitelistedColumn } from "../db/repository/postgres-task-repository";
 
 type FilterItem = z.infer<typeof filterItemSchema>;
-type TaskColumn = keyof typeof tasks._.columns;
 
-const sortableColumns = tasks;
-
-function getColumn(id: string) {
-  const col = (tasks as any)[id];
-  if (!col) return null;
-  return col;
-}
-
-/** Translate a single advanced-filter item into a Drizzle SQL condition. */
+/** Translate a single advanced-filter item into a Drizzle SQL condition safely using whitelisted columns. */
 export function buildFilterCondition(filter: FilterItem): SQL | undefined {
-  const column = getColumn(filter.id);
+  const column = getWhitelistedColumn(filter.id) as any;
   if (!column) return undefined;
 
   const value = filter.value;
@@ -56,11 +48,11 @@ export function buildFilterCondition(filter: FilterItem): SQL | undefined {
       if (Array.isArray(value)) return undefined;
       return ne(column, value);
     case "inArray": {
-      const arr = Array.isArray(value) ? value : value.split(",");
+      const arr = Array.isArray(value) ? value : String(value).split(",");
       return arr.length ? inArray(column, arr) : undefined;
     }
     case "notInArray": {
-      const arr = Array.isArray(value) ? value : value.split(",");
+      const arr = Array.isArray(value) ? value : String(value).split(",");
       return arr.length ? notInArray(column, arr) : undefined;
     }
     case "lt":
@@ -72,12 +64,12 @@ export function buildFilterCondition(filter: FilterItem): SQL | undefined {
     case "gte":
       return gte(column, value);
     case "isBetween": {
-      const [start, end] = Array.isArray(value) ? value : value.split(",");
+      const [start, end] = Array.isArray(value) ? value : String(value).split(",");
       if (!start || !end) return undefined;
       const isDateColumn = filter.variant === "date" || filter.variant === "dateRange";
       const startVal = isDateColumn ? new Date(Number(start)) : Number(start);
       const endVal = isDateColumn ? new Date(Number(end)) : Number(end);
-      return between(column, startVal, endVal);
+      return between(column, startVal, endVal as any);
     }
     case "isEmpty":
       return isNull(column);
@@ -101,7 +93,6 @@ export function buildTasksWhere(
 ): SQL | undefined {
   const conditions: (SQL | undefined)[] = [];
 
-  // Simple convenience params (used by the UI's toolbar / faceted filters).
   if (query.title) {
     conditions.push(ilike(tasks.title, `%${query.title}%`));
   }
@@ -124,7 +115,6 @@ export function buildTasksWhere(
     conditions.push(lte(tasks.createdAt, new Date(query.to)));
   }
 
-  // Advanced filter builder (per-column operators, and/or joined).
   if (query.filters?.length) {
     const advanced = query.filters
       .map(buildFilterCondition)
@@ -142,14 +132,14 @@ export function buildTasksWhere(
   return and(...finalConditions);
 }
 
-/** Build ORDER BY clauses from the sort param, defaulting to createdAt desc. */
+/** Build ORDER BY clauses from the sort param safely using whitelisted columns. */
 export function buildTasksOrderBy(query: z.infer<typeof getTasksQuerySchema>) {
   if (!query.sort?.length) {
     return [desc(tasks.createdAt)];
   }
   return query.sort
     .map((s) => {
-      const column = getColumn(s.id);
+      const column = getWhitelistedColumn(s.id);
       if (!column) return null;
       return s.desc ? desc(column) : asc(column);
     })

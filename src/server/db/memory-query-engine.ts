@@ -1,4 +1,4 @@
-import { getMemoryTasks, resetMemoryTasks } from "./memory-store";
+import { getMemoryTasks } from "./memory-store";
 import type { Task } from "./schema";
 import type { z } from "zod";
 import type { filterItemSchema, getTasksQuerySchema } from "../hono/validators";
@@ -118,7 +118,7 @@ export function queryMemoryTasks(query: z.infer<typeof getTasksQuerySchema>) {
         const valB = (b as any)[s.id];
         if (valA === valB) continue;
 
-        let cmp = 0;
+        let cmp: number;
         if (valA instanceof Date || valB instanceof Date) {
           cmp = new Date(valA).getTime() - new Date(valB).getTime();
         } else if (typeof valA === "number" && typeof valB === "number") {

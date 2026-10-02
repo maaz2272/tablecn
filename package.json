@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/server/db/migrate.ts",
     "db:seed": "tsx src/server/db/seed.ts",
@@ -48,14 +48,32 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
+    "@typescript-eslint/parser": "^8.71.0",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.31.11",
+    "eslint": "^10.11.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
     "typescript": "^7.0.0"
+  },
+  "overrides": {
+    "@typescript-eslint/parser": {
+      "typescript": "~6.0.3"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "typescript": "~6.0.3"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "typescript": "~6.0.3"
+    },
+    "ts-api-utils": {
+      "typescript": "~6.0.3"
+    }
   }
 }
