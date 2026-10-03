@@ -21,7 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { createTask, updateTask } from "@/app/actions/tasks";
-import type { Task } from "@/types";
+import type { Task, TaskStatus, TaskPriority, TaskLabel } from "@/types";
 
 interface TaskSheetProps {
   task?: Task;
@@ -97,7 +97,7 @@ export function TaskSheet({ task, open, onOpenChange }: TaskSheetProps) {
                 <Label>Status</Label>
                 <Select
                   value={form.status}
-                  onValueChange={(v) => setForm((f) => ({ ...f, status: v as any }))}
+                  onValueChange={(v) => setForm((f) => ({ ...f, status: v as TaskStatus }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -115,7 +115,7 @@ export function TaskSheet({ task, open, onOpenChange }: TaskSheetProps) {
                 <Select
                   value={form.priority}
                   onValueChange={(v) =>
-                    setForm((f) => ({ ...f, priority: v as any }))
+                    setForm((f) => ({ ...f, priority: v as TaskPriority }))
                   }
                 >
                   <SelectTrigger>
@@ -132,7 +132,7 @@ export function TaskSheet({ task, open, onOpenChange }: TaskSheetProps) {
                 <Label>Label</Label>
                 <Select
                   value={form.label}
-                  onValueChange={(v) => setForm((f) => ({ ...f, label: v as any }))}
+                  onValueChange={(v) => setForm((f) => ({ ...f, label: v as TaskLabel }))}
                 >
                   <SelectTrigger>
                     <SelectValue />

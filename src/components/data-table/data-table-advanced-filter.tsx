@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { tasksSearchParams } from "@/lib/search-params";
-import type { FilterItem } from "@/types";
+import type { FilterItem, FilterVariant, FilterOperator } from "@/types";
 
 const COLUMN_OPTIONS = [
   { label: "Title", value: "title", type: "text" },
@@ -96,7 +96,7 @@ export function DataTableAdvancedFilter() {
     const newRule: FilterItem = {
       id: defaultCol.value,
       value: "",
-      variant: defaultCol.type as any,
+      variant: defaultCol.type as FilterVariant,
       operator: "iLike",
       filterId: Math.random().toString(36).substring(2, 9),
     };
@@ -117,7 +117,7 @@ export function DataTableAdvancedFilter() {
     // If column changed, reset operator and value
     if (updates.id && updates.id !== current.id) {
       const colMeta = COLUMN_OPTIONS.find((c) => c.value === updates.id);
-      const newVariant = (colMeta?.type ?? "text") as any;
+      const newVariant = (colMeta?.type ?? "text") as FilterVariant;
       const defaultOperator = OPERATORS_BY_TYPE[newVariant]?.[0]?.value ?? "eq";
       updated[index] = {
         ...current,
@@ -229,7 +229,7 @@ export function DataTableAdvancedFilter() {
                   {/* Operator Select */}
                   <Select
                     value={rule.operator}
-                    onValueChange={(val: any) =>
+                    onValueChange={(val: FilterOperator) =>
                       updateFilterRule(idx, { operator: val })
                     }
                   >

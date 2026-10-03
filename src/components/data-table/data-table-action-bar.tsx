@@ -71,6 +71,7 @@ export function DataTableActionBar<TData extends { id: string }>({
       <Button
         variant="ghost"
         size="icon"
+        aria-label="Clear selection"
         className="h-8 w-8 text-muted-foreground hover:text-foreground"
         onClick={() => table.toggleAllRowsSelected(false)}
       >

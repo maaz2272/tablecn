@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { CheckCircle2, Clock, Flame, ListTodo } from "lucide-react";
 import type { Task, FacetsResponse } from "@/types";
 
@@ -15,29 +14,20 @@ export function TaskStatsCards({
   totalTasks = 0,
   data = [],
 }: TaskStatsCardsProps) {
-  const statusCounts = React.useMemo(() => {
-    const map: Record<string, number> = {};
-    facets?.status?.forEach((s) => {
-      map[s.value] = s.count;
-    });
-    return map;
-  }, [facets]);
+  const statusCounts: Record<string, number> = {};
+  facets?.status?.forEach((s) => {
+    statusCounts[s.value] = s.count;
+  });
 
-  const priorityCounts = React.useMemo(() => {
-    const map: Record<string, number> = {};
-    facets?.priority?.forEach((p) => {
-      map[p.value] = p.count;
-    });
-    return map;
-  }, [facets]);
+  const priorityCounts: Record<string, number> = {};
+  facets?.priority?.forEach((p) => {
+    priorityCounts[p.value] = p.count;
+  });
 
-  const inProgress = statusCounts["in-progress"] || 0;
-  const done = statusCounts["done"] || 0;
-  const highPriority = priorityCounts["high"] || 0;
-
-  const totalEstHours = React.useMemo(() => {
-    return data.reduce((acc, curr) => acc + (curr.estimatedHours || 0), 0);
-  }, [data]);
+  const inProgress = statusCounts["in-progress"] ?? 0;
+  const done = statusCounts["done"] ?? 0;
+  const highPriority = priorityCounts["high"] ?? 0;
+  const totalEstHours = data.reduce((acc, curr) => acc + (curr.estimatedHours ?? 0), 0);
 
   const cards = [
     {
@@ -72,11 +62,11 @@ export function TaskStatsCards({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-      {cards.map((card, idx) => {
+      {cards.map((card) => {
         const Icon = card.icon;
         return (
           <div
-            key={idx}
+            key={card.title}
             className="flex items-center justify-between rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md"
           >
             <div className="space-y-1">

@@ -17,6 +17,7 @@ import { DataTableAdvancedFilter } from "./data-table-advanced-filter";
 import { exportTableToCSV, exportTableToJSON } from "@/lib/export";
 import { seedTasksAction } from "@/app/actions/tasks";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import type { FacetsResponse } from "@/types";
 
 const statusOptions = [
@@ -49,7 +50,7 @@ export function DataTableToolbar<TData>({
   facets,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-  const [isSeeding, setIsSeeding] = React.useState(false);
+  const [isSeedPending, startSeedTransition] = React.useTransition();
 
   function withCounts(
     options: { label: string; value: string }[],
@@ -61,16 +62,15 @@ export function DataTableToolbar<TData>({
     }));
   }
 
-  const handleSeed = async () => {
-    try {
-      setIsSeeding(true);
-      await seedTasksAction();
-      toast.success("Dataset re-seeded successfully!");
-    } catch {
-      toast.error("Failed to re-seed dataset.");
-    } finally {
-      setIsSeeding(false);
-    }
+  const handleSeed = () => {
+    startSeedTransition(async () => {
+      try {
+        await seedTasksAction();
+        toast.success("Dataset re-seeded successfully!");
+      } catch {
+        toast.error("Failed to re-seed dataset.");
+      }
+    });
   };
 
   return (
@@ -127,9 +127,9 @@ export function DataTableToolbar<TData>({
           size="sm"
           className="h-8 text-xs gap-1.5"
           onClick={handleSeed}
-          disabled={isSeeding}
+          disabled={isSeedPending}
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isSeeding ? "animate-spin" : ""}`} />
+          <RefreshCw className={cn("h-3.5 w-3.5", isSeedPending && "animate-spin")} />
           <span>Reset Data</span>
         </Button>
 

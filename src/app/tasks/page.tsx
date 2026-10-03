@@ -9,6 +9,7 @@ import { TaskStatsCards } from "@/components/tasks/task-stats-cards";
 import { TasksPresetTabs } from "@/components/tasks/tasks-preset-tabs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AlertCircle } from "lucide-react";
+import type { TasksQuery } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export default async function TasksPage(props: TasksPageProps) {
   );
 }
 
-async function TasksTableFetcher({ query }: { query: any }) {
+async function TasksTableFetcher({ query }: { query: Partial<TasksQuery> }) {
   const [tasksRes, facetsRes] = await Promise.all([
     getTasks(query),
     getTaskFacets(query),
@@ -68,16 +69,13 @@ async function TasksTableFetcher({ query }: { query: any }) {
     );
   }
 
-  const data = tasksRes.data;
-  const pageCount = tasksRes.pageCount;
-  const total = tasksRes.total;
-  const facets = facetsRes;
+  const { data, pageCount, total } = tasksRes;
 
   return (
     <div className="flex flex-col gap-6">
-      <TaskStatsCards facets={facets} totalTasks={total} data={data} />
-      <TasksPresetTabs facets={facets} total={total} />
-      <TasksTable data={data} pageCount={pageCount} facets={facets} />
+      <TaskStatsCards facets={facetsRes} totalTasks={total} data={data} />
+      <TasksPresetTabs facets={facetsRes} total={total} />
+      <TasksTable data={data} pageCount={pageCount} facets={facetsRes} />
     </div>
   );
 }
